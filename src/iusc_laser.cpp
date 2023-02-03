@@ -17,9 +17,11 @@ typedef enum LASER_STATE{
 
 bool laser_command = false;
 LASER_STATE laser_state = LASER_READY;
+struct timeval tvlaser_command;
 
 void laser_command_callback(const std_msgs::Bool& message){
   laser_command = message.data;
+  gettimeofday(&tvlaser_command, NULL);
 }
 
 int main(int argc, char **argv)
@@ -58,11 +60,17 @@ int main(int argc, char **argv)
     double totaltime = tvend.tv_sec - tvstart.tv_sec + 1e-6 * (tvend.tv_usec - tvstart.tv_usec);
     switch(laser_state){
     case LASER_READY:{
-      // turn on the laser when the command is triggered
-      if(laser_command == true){
-	gp->setGpioValue(LASER_IO, GPIO_ON);
-	laser_on_time = tvend;
-	laser_state = LASER_ON;
+      double laser_command_callback_timeout = tvend.tv_sec - tvlaser_command.tv_sec + 1e-6 * (tvend.tv_usec - tvlaser_command.tv_usec);
+      if(laser_command_callback_timeout >= 5){
+	ROS_INFO_THROTTLE(20, "Waiting for laser command...");
+      }else{
+	// turn on the laser when the command is triggered
+	if(laser_command == true){
+	  gp->setGpioValue(LASER_IO, GPIO_ON);
+	  laser_on_time = tvend;
+	  laser_state = LASER_ON;
+	  ROS_INFO("IUSC LASER Triggered!");
+	}
       }
       break;
     }
@@ -71,12 +79,14 @@ int main(int argc, char **argv)
 	gp->setGpioValue(LASER_IO, GPIO_OFF);
 	laser_state = LASER_OVERHEAT;
 	laser_off_time = tvend;
+	ROS_INFO("IUSC LASER Turning Off");
       }else{
 	double on_time = tvend.tv_sec - laser_on_time.tv_sec + 1e-6 * (tvend.tv_usec - laser_on_time.tv_usec);
 	if(on_time >= 5){
 	  gp->setGpioValue(LASER_IO, GPIO_OFF);
 	  laser_state = LASER_OVERHEAT;
 	  laser_off_time = tvend;
+	  ROS_INFO("IUSC LASER Overheat!");
 	}
       }
       break;

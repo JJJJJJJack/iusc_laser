@@ -9,7 +9,9 @@
 
 #define GPIO_ON "1"           //开启
 #define GPIO_OFF "0"          //关闭
-#define LASER_IO "66"     //控制引脚
+// GPIO port refer to https://wiki.amovlab.com/public/allspark-nx/开发帮助/接口功能测试/GPIO功能测试/GPIO.html
+// This demo uses PIN 5
+#define LASER_IO "419"     //控制引脚
 #define DIRECTION "out"  //方向为输出
 
 class gpio

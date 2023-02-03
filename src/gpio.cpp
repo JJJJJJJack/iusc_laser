@@ -1,5 +1,5 @@
 #include "gpio.h"
-int i;
+
 gpio::gpio(/* args */)
 {
 }
