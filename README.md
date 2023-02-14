@@ -13,5 +13,5 @@ To run the ros nodes needed for IUSC program, the [robot-upstart](http://wiki.ro
 sudo apt-get update && sudo apt-get install ros-melodic-robot-upstart
 rosrun robot_upstart install p450_experiment/launch_basic/p450_optitrack.launch --job iusc_startup --symlink
 ```
-* Naming is configured by --job iusc_startup.
+* Naming is configured by `--job iusc_startup`.
 * Link file instead of launch file created for startup by using `--symlink`.
